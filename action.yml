@@ -1,0 +1,70 @@
+name: 'Send Email (SMTP)'
+description: >-
+  Send an email via SMTP. Supports multiple recipients, plain or multi-line /
+  HTML body, and multiple attachments (paths, glob patterns or JSON).
+author: 'your-name'
+
+branding:
+  icon: 'mail'
+  color: 'blue'
+
+inputs:
+  smtp_host:
+    description: 'SMTP server host, e.g. smtp.gmail.com / smtp.qq.com / smtp.163.com.'
+    required: true
+  smtp_port:
+    description: 'SMTP server port. Defaults to 465 (implicit SSL).'
+    required: false
+    default: '465'
+  smtp_username:
+    description: 'SMTP login username (usually the sender email address).'
+    required: true
+  smtp_password:
+    description: 'SMTP login password or app-specific password. Always pass this via secrets!'
+    required: true
+  to:
+    description: 'Recipient address(es). Separate multiple addresses with comma, semicolon or newline.'
+    required: true
+  cc:
+    description: 'CC address(es), same separators as "to".'
+    required: false
+  bcc:
+    description: 'BCC address(es), same separators as "to". BCC is not shown in the mail headers.'
+    required: false
+  from:
+    description: 'Sender address shown in the mail. Defaults to "username".'
+    required: false
+  sender:
+    description: 'Sender display name, e.g. "CI Bot".'
+    required: false
+  subject:
+    description: 'Email subject.'
+    required: true
+  body:
+    description: >-
+      Email body. Supports single-line or multi-line text, and an optional
+      "file://path" prefix to load the content from a file.
+    required: true
+  content_type:
+    description: '"text/plain" (default) or "text/html".'
+    required: false
+    default: 'text/plain'
+  attachments:
+    description: >-
+      Attachment(s), multiple supported. Either newline/comma/semicolon
+      separated paths or glob patterns (e.g. "dist/*.zip"), or a JSON array
+      like [{"path":"build/app.apk","filename":"app.apk"}]. An optional
+      "file://path" prefix loads the list from a file.
+    required: false
+  secure:
+    description: 'TLS mode: auto (default, SSL for port 465, STARTTLS otherwise), ssl, starttls or none.'
+    required: false
+    default: 'auto'
+
+outputs:
+  message_id:
+    description: 'Message-ID of the sent email.'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'

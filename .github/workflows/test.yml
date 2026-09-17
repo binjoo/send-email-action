@@ -1,0 +1,67 @@
+# 集成测试：手动触发，用仓库内的 Action（uses: ./）真实发送测试邮件。
+# 运行前需在仓库 Settings → Secrets and variables → Actions 中配置：
+#   SMTP_USERNAME  发件邮箱
+#   SMTP_PASSWORD  SMTP 授权码（QQ/163）或应用专用密码（Gmail）
+name: Test send-email-action
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 场景1：正常发送（多行正文 + 附件）
+        uses: ./
+        with:
+          smtp_host: smtp.qq.com          # 按你的服务商修改，如 smtp.163.com / smtp.gmail.com
+          smtp_port: '465'
+          smtp_username: ${{ secrets.SMTP_USERNAME }}
+          smtp_password: ${{ secrets.SMTP_PASSWORD }}
+          sender: 'CI 测试机器人'
+          to: ${{ secrets.SMTP_USERNAME }}  # 发给自己，去收件箱确认
+          subject: 'Action 测试 run #${{ github.run_id }}'
+          body: |
+            多行正文第一行 ✅
+            分支：${{ github.ref_name }}
+            触发者：${{ github.actor }}
+          attachments: README.md
+
+      - name: 场景2：HTML 邮件
+        uses: ./
+        with:
+          smtp_host: smtp.qq.com
+          smtp_port: '465'
+          smtp_username: ${{ secrets.SMTP_USERNAME }}
+          smtp_password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.SMTP_USERNAME }}
+          subject: 'HTML 测试 run #${{ github.run_id }}'
+          content_type: text/html
+          body: |
+            <h2>构建成功</h2>
+            <p>仓库：<b>${{ github.repository }}</b></p>
+
+      - name: 场景3：附件不存在应当失败（不会真的发邮件）
+        id: expect_fail
+        continue-on-error: true
+        uses: ./
+        with:
+          smtp_host: smtp.qq.com
+          smtp_username: ${{ secrets.SMTP_USERNAME }}
+          smtp_password: ${{ secrets.SMTP_PASSWORD }}
+          to: ${{ secrets.SMTP_USERNAME }}
+          subject: '这条不应发出'
+          body: 'x'
+          attachments: '不存在.zip'
+
+      - name: 断言场景3确实失败
+        run: |
+          if [ "${{ steps.expect_fail.outcome }}" != "failure" ]; then
+            echo "::error::附件不存在的场景没有按预期失败"
+            exit 1
+          fi
+          echo "场景3符合预期：缺失附件正确报错"
