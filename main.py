@@ -7,7 +7,6 @@ environment variable (upper-cased), which is what this script reads.
 """
 
 import glob
-import json
 import mimetypes
 import os
 import re
@@ -44,18 +43,6 @@ def get_input(name, default="", *, required=False, strip=True):
     return value
 
 
-def read_value(value, input_name):
-    """Support an optional file:// prefix that loads the input value from a file."""
-    if value.startswith("file://"):
-        path = value[len("file://"):]
-        try:
-            with open(path, encoding="utf-8") as handle:
-                return handle.read()
-        except OSError as exc:
-            fail(f"Input '{input_name}': cannot read file '{path}' ({exc}).")
-    return value
-
-
 def parse_addresses(raw, input_name):
     """Split an address list on comma / semicolon / newline.
 
@@ -79,38 +66,9 @@ def normalize_content_type(raw):
 
 
 def parse_attachments(raw):
-    """Return a list of (path, filename) pairs.
-
-    Accepted formats:
-      1. JSON array, compatible with devellany/send-mail:
-         [{"path": "build/app.apk", "filename": "app.apk"}, "extra.txt"]
-      2. Newline / comma / semicolon separated paths; each entry may be a
-         glob pattern (e.g. "dist/*.zip").
-    """
-    raw = raw.strip()
-    if not raw:
-        return []
-
+    """Return a list of (path, filename) pairs from a newline/comma/semicolon
+    separated list of file paths or glob patterns (e.g. "dist/*.zip")."""
     pairs = []
-    if raw.startswith("["):
-        try:
-            items = json.loads(raw)
-        except json.JSONDecodeError as exc:
-            fail(f"Input 'attachments': invalid JSON ({exc}).")
-        if not isinstance(items, list):
-            fail("Input 'attachments': JSON value must be an array.")
-        for item in items:
-            if isinstance(item, dict):
-                path = item.get("path")
-                if not path:
-                    fail(f"Input 'attachments': entry {item!r} lacks a 'path' property.")
-                pairs.append((path, item.get("filename") or os.path.basename(path)))
-            elif isinstance(item, str):
-                pairs.append((item, os.path.basename(item)))
-            else:
-                fail(f"Input 'attachments': unsupported entry {item!r}.")
-        return pairs
-
     for pattern in (part.strip() for part in re.split(r"[,;\r\n]+", raw)):
         if not pattern:
             continue
@@ -191,12 +149,11 @@ def main():
 
     from_addr = get_input("from", username)
     sender = get_input("sender")
-    subject = read_value(get_input("subject", required=True), "subject")
-    body = read_value(get_input("body", required=True), "body")
+    subject = get_input("subject", required=True)
+    body = get_input("body", required=True)
     content_type = normalize_content_type(get_input("content_type", "text/plain"))
 
-    attachments_raw = read_value(get_input("attachments"), "attachments")
-    attachments = parse_attachments(attachments_raw)
+    attachments = parse_attachments(get_input("attachments"))
     for path, _ in attachments:
         if not os.path.isfile(path):
             fail(f"Input 'attachments': file not found: '{path}'.")

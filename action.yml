@@ -1,8 +1,8 @@
 name: 'Send Email (SMTP)'
 description: >-
   Send an email via SMTP. Supports multiple recipients, plain or multi-line /
-  HTML body, and multiple attachments (paths, glob patterns or JSON).
-author: 'your-name'
+  HTML body, and multiple attachments (paths or glob patterns).
+author: 'binjoo'
 
 branding:
   icon: 'mail'
@@ -41,9 +41,7 @@ inputs:
     description: 'Email subject.'
     required: true
   body:
-    description: >-
-      Email body. Supports single-line or multi-line text, and an optional
-      "file://path" prefix to load the content from a file.
+    description: 'Email body. Supports single-line or multi-line text.'
     required: true
   content_type:
     description: '"text/plain" (default) or "text/html".'
@@ -51,10 +49,8 @@ inputs:
     default: 'text/plain'
   attachments:
     description: >-
-      Attachment(s), multiple supported. Either newline/comma/semicolon
-      separated paths or glob patterns (e.g. "dist/*.zip"), or a JSON array
-      like [{"path":"build/app.apk","filename":"app.apk"}]. An optional
-      "file://path" prefix loads the list from a file.
+      Attachment(s), multiple supported. Newline/comma/semicolon separated
+      paths or glob patterns (e.g. "dist/*.zip").
     required: false
   secure:
     description: 'TLS mode: auto (default, SSL for port 465, STARTTLS otherwise), ssl, starttls or none.'

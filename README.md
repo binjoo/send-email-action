@@ -1,14 +1,13 @@
 # Send Email Action (Python)
 
-通过 SMTP 发送邮件的 GitHub Action，使用 **Python 标准库** 实现（零第三方依赖）。参考 [devellany/send-mail](https://github.com/devellany/send-mail)（Node.js 版）的功能，并兼容其 `file://` 与 JSON 附件格式。
+通过 SMTP 发送邮件的 GitHub Action，使用 **Python 标准库** 实现（零第三方依赖），以 Docker 方式运行。
 
 支持：
 
-- ✅ SMTP 服务器信息：`host` / `port` / `username` / `password`
+- ✅ SMTP 服务器信息：`smtp_host` / `smtp_port` / `smtp_username` / `smtp_password`
 - ✅ **多个收件人**（逗号、分号或换行分隔），另支持 `cc` / `bcc`
 - ✅ 邮件标题、**单行或多行正文**，可选 `text/html` 格式
-- ✅ **多个附件**（直接列路径、glob 通配符，或 JSON 数组）
-- ✅ `file://` 前缀：从文件读取正文 / 标题 / 附件列表（方便传长文本）
+- ✅ **多个附件**（直接列路径或 glob 通配符）
 - ✅ 自动 TLS：465 端口走 SSL，其他端口走 STARTTLS（可用 `secure` 强制指定）
 
 ## 使用示例
@@ -28,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Send email
-        uses: your-name/send-email-action@v1
+        uses: binjoo/send-email-action@v1
         with:
           smtp_host: smtp.qq.com
           smtp_port: 465
@@ -52,7 +51,7 @@ jobs:
 
 ```yaml
       - name: Send HTML email
-        uses: your-name/send-email-action@v1
+        uses: binjoo/send-email-action@v1
         with:
           smtp_host: smtp.example.com
           smtp_username: ${{ secrets.SMTP_USERNAME }}
@@ -65,18 +64,15 @@ jobs:
             <p>版本：<b>${{ github.ref_name }}</b></p>
 ```
 
-### JSON 格式附件（兼容 devellany/send-mail）
+### 多个附件（路径列表 / 通配符）
 
 ```yaml
-          attachments: '[{"path":"build/app.apk","filename":"myapp.apk"},{"path":"CHANGELOG.md"}]'
+          attachments: |          # 每行一个，支持 glob 通配符，匹配到的文件自动展开
+            dist/*.zip
+            build/reports/report.html
 ```
 
-### 用 `file://` 从文件读取正文 / 附件列表
-
-```yaml
-          body: file://release-notes.md
-          attachments: file://attachment-list.txt
-```
+也可以写在同一行，用逗号分隔：`attachments: 'dist/*.zip, README.md'`
 
 ## 输入参数
 
@@ -92,9 +88,9 @@ jobs:
 | `from` | 否 | `username` | 发件人地址（某些服务商要求与登录账号一致） |
 | `sender` | 否 | - | 发件人显示名称，如 `CI Bot` |
 | `subject` | 是 | - | 邮件标题 |
-| `body` | 是 | - | 邮件正文，支持多行文本；支持 `file://路径` 从文件读取 |
+| `body` | 是 | - | 邮件正文，支持单行或多行文本 |
 | `content_type` | 否 | `text/plain` | `text/plain` 或 `text/html` |
-| `attachments` | 否 | - | 附件：换行/逗号分隔的路径或 glob 模式，或 JSON 数组；支持 `file://路径` |
+| `attachments` | 否 | - | 附件：换行/逗号分隔的路径或 glob 通配符，多个自动展开 |
 | `secure` | 否 | `auto` | `auto`（465 走 SSL，其余走 STARTTLS）/ `ssl` / `starttls` / `none` |
 
 ## 输出
