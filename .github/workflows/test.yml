@@ -27,7 +27,7 @@ jobs:
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           from: ${{ secrets.FROM_MAIL }}    # 未配置时自动回退到 SMTP_USERNAME（仅当它是邮箱）
           sender: 'CI 测试机器人'
-          to_mail: ${{ secrets.TO_MAIL }}  # 去收件邮箱确认
+          to: ${{ secrets.TO_MAIL }}  # 去收件邮箱确认
           subject: 'Action 测试 run #${{ github.run_id }}'
           body: |
             多行正文第一行 ✅
@@ -43,7 +43,7 @@ jobs:
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           from: ${{ secrets.FROM_MAIL }}
-          to_mail: ${{ secrets.TO_MAIL }}
+          to: ${{ secrets.TO_MAIL }}
           subject: 'HTML 测试 run #${{ github.run_id }}'
           content_type: text/html
           body: |
@@ -63,7 +63,7 @@ jobs:
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           from: ${{ secrets.FROM_MAIL }}
-          to_mail: ${{ secrets.TO_MAIL }}
+          to: ${{ secrets.TO_MAIL }}
           subject: '这条不应发出'
           body: 'x'
           attachments: '不存在.zip'

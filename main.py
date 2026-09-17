@@ -144,7 +144,7 @@ def main():
     username = get_input("smtp_username", required=True)
     password = get_input("smtp_password", required=True, strip=False)
 
-    to_tokens, to_envelope = parse_addresses(get_input("to_mail", required=True), "to_mail")
+    to_tokens, to_envelope = parse_addresses(get_input("to", required=True), "to")
     cc_raw = get_input("cc")
     bcc_raw = get_input("bcc")
     cc_tokens, cc_envelope = parse_addresses(cc_raw, "cc") if cc_raw else ([], [])

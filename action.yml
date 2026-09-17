@@ -22,14 +22,14 @@ inputs:
   smtp_password:
     description: 'SMTP login password or app-specific password. Always pass this via secrets!'
     required: true
-  to_mail:
+  to:
     description: 'Recipient address(es). Separate multiple addresses with comma, semicolon or newline.'
     required: true
   cc:
-    description: 'CC address(es), same separators as "to_mail".'
+    description: 'CC address(es), same separators as "to".'
     required: false
   bcc:
-    description: 'BCC address(es), same separators as "to_mail". BCC is not shown in the mail headers.'
+    description: 'BCC address(es), same separators as "to". BCC is not shown in the mail headers.'
     required: false
   from:
     description: 'Sender address shown in the mail. Defaults to "username".'
