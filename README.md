@@ -34,7 +34,7 @@ jobs:
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           sender: 'CI 机器人'
-          to: 'dev@example.com, ops@example.com'   # 多个收件人
+          to_mail: 'dev@example.com, ops@example.com'   # 多个收件人
           cc: 'boss@example.com'
           subject: '构建通知：${{ github.repository }}'
           body: |                                   # 多行正文
@@ -56,7 +56,7 @@ jobs:
           smtp_host: smtp.example.com
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
-          to: 'dev@example.com'
+          to_mail: 'dev@example.com'
           subject: '发布报告'
           content_type: text/html
           body: |
@@ -82,10 +82,10 @@ jobs:
 | `smtp_port` | 否 | `465` | SMTP 端口 |
 | `smtp_username` | 是 | - | SMTP 登录用户名（通常是发件邮箱） |
 | `smtp_password` | 是 | - | SMTP 密码或授权码，**务必通过 `secrets` 传入** |
-| `to` | 是 | - | 收件人，多个用逗号 / 分号 / 换行分隔 |
-| `cc` | 否 | - | 抄送，分隔方式同 `to` |
-| `bcc` | 否 | - | 密送（不会出现在邮件头中），分隔方式同 `to` |
-| `from` | 否 | `username` | 发件人地址（某些服务商要求与登录账号一致） |
+| `to_mail` | 是 | - | 收件人，多个用逗号 / 分号 / 换行分隔 |
+| `cc` | 否 | - | 抄送，分隔方式同 `to_mail` |
+| `bcc` | 否 | - | 密送（不会出现在邮件头中），分隔方式同 `to_mail` |
+| `from` | 视情况 | - | 发件人地址。`smtp_username` 是邮箱地址时默认取它；否则必填 |
 | `sender` | 否 | - | 发件人显示名称，如 `CI Bot` |
 | `subject` | 是 | - | 邮件标题 |
 | `body` | 是 | - | 邮件正文，支持单行或多行文本 |

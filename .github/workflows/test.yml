@@ -1,7 +1,9 @@
 # 集成测试：手动触发，用仓库内的 Action（uses: ./）真实发送测试邮件。
 # 运行前需在仓库 Settings → Secrets and variables → Actions 中配置：
-#   SMTP_USERNAME  发件邮箱
+#   SMTP_HOST      SMTP 服务器地址，如 smtp.qq.com / smtp.163.com / smtp.gmail.com
+#   SMTP_USERNAME  SMTP 登录账号（发件邮箱）
 #   SMTP_PASSWORD  SMTP 授权码（QQ/163）或应用专用密码（Gmail）
+#   TO_MAIL        收件邮箱
 name: Test send-email-action
 
 on:
@@ -18,12 +20,12 @@ jobs:
       - name: 场景1：正常发送（多行正文 + 附件）
         uses: ./
         with:
-          smtp_host: smtp.qq.com          # 按你的服务商修改，如 smtp.163.com / smtp.gmail.com
+          smtp_host: ${{ secrets.SMTP_HOST }}
           smtp_port: '465'
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
           sender: 'CI 测试机器人'
-          to: ${{ secrets.SMTP_USERNAME }}  # 发给自己，去收件箱确认
+          to_mail: ${{ secrets.TO_MAIL }}  # 去收件邮箱确认
           subject: 'Action 测试 run #${{ github.run_id }}'
           body: |
             多行正文第一行 ✅
@@ -34,11 +36,11 @@ jobs:
       - name: 场景2：HTML 邮件
         uses: ./
         with:
-          smtp_host: smtp.qq.com
+          smtp_host: ${{ secrets.SMTP_HOST }}
           smtp_port: '465'
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
-          to: ${{ secrets.SMTP_USERNAME }}
+          to_mail: ${{ secrets.TO_MAIL }}
           subject: 'HTML 测试 run #${{ github.run_id }}'
           content_type: text/html
           body: |
@@ -50,10 +52,10 @@ jobs:
         continue-on-error: true
         uses: ./
         with:
-          smtp_host: smtp.qq.com
+          smtp_host: ${{ secrets.SMTP_HOST }}
           smtp_username: ${{ secrets.SMTP_USERNAME }}
           smtp_password: ${{ secrets.SMTP_PASSWORD }}
-          to: ${{ secrets.SMTP_USERNAME }}
+          to_mail: ${{ secrets.TO_MAIL }}
           subject: '这条不应发出'
           body: 'x'
           attachments: '不存在.zip'

@@ -51,8 +51,11 @@ def parse_addresses(raw, input_name):
     """
     tokens = [token.strip() for token in re.split(r"[,;\r\n]+", raw) if token.strip()]
     envelope = [parseaddr(token)[1] for token in tokens]
-    if not tokens or not all(envelope):
-        fail(f"Input '{input_name}' contains no valid email address: {raw!r}")
+    invalid = not tokens or any(
+        not addr or not re.fullmatch(r"[^@\s]+@[^@\s]+", addr) for addr in envelope
+    )
+    if invalid:
+        fail(f"Input '{input_name}' contains an invalid email address: {raw!r}")
     return tokens, envelope
 
 
@@ -141,13 +144,19 @@ def main():
     username = get_input("smtp_username", required=True)
     password = get_input("smtp_password", required=True, strip=False)
 
-    to_tokens, to_envelope = parse_addresses(get_input("to", required=True), "to")
+    to_tokens, to_envelope = parse_addresses(get_input("to_mail", required=True), "to_mail")
     cc_raw = get_input("cc")
     bcc_raw = get_input("bcc")
     cc_tokens, cc_envelope = parse_addresses(cc_raw, "cc") if cc_raw else ([], [])
     bcc_tokens, bcc_envelope = parse_addresses(bcc_raw, "bcc") if bcc_raw else ([], [])
 
-    from_addr = get_input("from", username)
+    # Do not blindly assume the SMTP username is an email address; fall back to
+    # it only when it looks like one, otherwise an explicit 'from' is required.
+    from_addr = get_input("from")
+    if not from_addr and re.fullmatch(r"[^@\s]+@[^@\s]+", username):
+        from_addr = username
+    if not from_addr:
+        fail("Input 'from' is required when 'smtp_username' is not an email address.")
     sender = get_input("sender")
     subject = get_input("subject", required=True)
     body = get_input("body", required=True)
