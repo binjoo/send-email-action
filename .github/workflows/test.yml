@@ -49,6 +49,10 @@ jobs:
           body: |
             <h2>构建成功</h2>
             <p>仓库：<b>${{ github.repository }}</b></p>
+          attachments: |
+            README.md
+            Dockerfile
+            action.yml
 
       - name: 场景3：附件不存在应当失败（不会真的发邮件）
         id: expect_fail
