@@ -8,10 +8,10 @@
 
 | 参数 | 必填 | 默认值 | 说明 |
 | --- | --- | --- | --- |
-| `smtp_host` | 是 | - | SMTP 服务器地址，如 `smtp.qq.com`、`smtp.163.com`、`smtp.gmail.com` |
+| `smtp_host` | 是 | - | SMTP 服务器地址|
 | `smtp_port` | 否 | `465` | SMTP 服务端口 |
 | `smtp_username` | 是 | - | SMTP 登录账号 |
-| `smtp_password` | 是 | - | SMTP 登录密码或授权码，请通过 `secrets` 传入 |
+| `smtp_password` | 是 | - | SMTP 登录密码 |
 | `to` | 是 | - | 收件人地址，多个以逗号 / 分号 / 换行分隔 |
 | `cc` | 否 | - | 抄送地址，分隔方式同 `to` |
 | `bcc` | 否 | - | 密送地址（不显示于邮件头），分隔方式同 `to` |
